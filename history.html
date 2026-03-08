@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GrowX Order History</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:radial-gradient(circle at top,#0b1d3a,#020611);
+color:white;
+overflow-x:hidden;
+}
+
+/* particles */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* header */
+
+.header{
+text-align:center;
+padding:40px 20px;
+}
+
+.title{
+font-size:36px;
+font-weight:600;
+color:#ffd34d;
+text-shadow:0 0 20px #ffd34d;
+}
+
+/* glass card */
+
+.glass{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+border-radius:25px;
+padding:25px;
+margin:20px;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:0 0 40px rgba(255,211,77,0.2);
+}
+
+/* stats */
+
+.stats{
+display:flex;
+justify-content:space-between;
+text-align:center;
+}
+
+.stat-number{
+font-size:32px;
+color:#ffd34d;
+text-shadow:0 0 10px #ffd34d;
+}
+
+/* section */
+
+.section-title{
+margin:20px;
+font-size:20px;
+opacity:.8;
+}
+
+/* order card */
+
+.order{
+margin-top:15px;
+padding:20px;
+border-radius:20px;
+position:relative;
+overflow:hidden;
+background:rgba(255,255,255,0.05);
+}
+
+/* badge */
+
+.badge{
+padding:6px 14px;
+border-radius:20px;
+font-size:12px;
+margin-left:10px;
+}
+
+.pending{
+background:#ff9f2e;
+}
+
+.complete{
+background:#1aff9c;
+}
+
+.cancel{
+background:#ff4d4d;
+}
+
+.link{
+color:#ffd34d;
+font-size:13px;
+word-break:break-all;
+}
+
+@media(max-width:600px){
+
+.stats{
+flex-direction:column;
+gap:15px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="header">
+<div class="title">GrowX</div>
+</div>
+
+<div class="glass stats">
+
+<div>
+<div class="stat-number" id="totalOrders">0</div>
+<div>Total Orders</div>
+</div>
+
+<div>
+<div class="stat-number" id="totalSpent">₹0</div>
+<div>Total Spent</div>
+</div>
+
+</div>
+
+<div class="section-title">Order History</div>
+
+<div class="glass" id="orderList"></div>
+
+<script>
+
+const API_URL="https://script.google.com/macros/s/AKfycbwyVwqw06pRsHaoiPkG_Hx8ZeVcRXyNF4ZAi4kqRjOQuxCVirJJSeIJk5AfnZJU3Ge_ow/exec";
+
+/* LOGIN CHECK */
+
+if(!localStorage.getItem("userID")){
+location.href="index.html";
+}
+
+/* LOAD ORDERS */
+
+async function loadOrders(){
+
+const userID=localStorage.getItem("userID");
+
+const res=await fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"orders",
+userID:userID
+})
+});
+
+const data=await res.json();
+
+let totalOrders=data.length;
+let totalSpent=0;
+
+document.getElementById("orderList").innerHTML="";
+
+data.forEach(o=>{
+
+totalSpent+=Number(o.price);
+
+let badgeClass="pending";
+
+if(o.status=="Complete") badgeClass="complete";
+if(o.status=="Cancelled") badgeClass="cancel";
+
+document.getElementById("orderList").innerHTML+=`
+
+<div class="order">
+
+<b>${o.service}</b>
+<span class="badge ${badgeClass}">${o.status}</span>
+
+<p>Order ID: ${o.orderID}</p>
+<p>User ID: ${o.userID}</p>
+<p>Qty: ${o.qty}</p>
+<p>Price: ₹${o.price}</p>
+<p>Date: ${o.date}</p>
+
+<p class="link">${o.link}</p>
+
+</div>
+
+`;
+
+});
+
+document.getElementById("totalOrders").innerText=totalOrders;
+document.getElementById("totalSpent").innerText="₹"+totalSpent;
+
+}
+
+loadOrders();
+
+</script>
+
+<script>
+
+/* particles */
+
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let particles=[];
+
+for(let i=0;i<120;i++){
+
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2,
+speed:Math.random()*0.5
+});
+
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="#ffd34d";
+
+particles.forEach(p=>{
+
+p.y-=p.speed;
+
+if(p.y<0){
+p.y=canvas.height;
+}
+
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+ctx.fill();
+
+});
+
+requestAnimationFrame(animate);
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
