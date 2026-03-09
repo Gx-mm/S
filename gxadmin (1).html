@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GrowX Admin Panel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:radial-gradient(circle at top,#0b1d3a,#020814);
+color:white;
+overflow:hidden;
+}
+
+.particle{
+position:absolute;
+width:3px;
+height:3px;
+background:white;
+opacity:0.5;
+animation:float 8s linear infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(100vh)}
+100%{transform:translateY(-10vh)}
+}
+
+.card{
+width:360px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+border-radius:20px;
+padding:30px;
+text-align:center;
+border:1px solid rgba(255,255,255,0.1);
+box-shadow:
+0 0 20px rgba(0,150,255,0.4),
+0 0 40px rgba(0,150,255,0.3);
+animation:fade .5s;
+}
+
+@keyframes fade{
+from{opacity:0;transform:scale(.9)}
+to{opacity:1;transform:scale(1)}
+}
+
+h2{
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:30px;
+border:2px solid rgba(255,255,255,0.15);
+background:transparent;
+color:white;
+outline:none;
+}
+
+input:focus{
+border-color:#00c3ff;
+box-shadow:0 0 10px rgba(0,200,255,.6);
+}
+
+button{
+margin-top:15px;
+width:100%;
+padding:12px;
+border:none;
+border-radius:30px;
+background:linear-gradient(45deg,#ffcc33,#ff6600);
+font-weight:600;
+cursor:pointer;
+box-shadow:0 0 15px rgba(255,170,0,.8);
+}
+
+button:hover{
+box-shadow:0 0 30px rgba(255,170,0,1);
+}
+
+.error{
+color:#ff4d4d;
+margin-top:10px;
+display:none;
+}
+
+.panel{
+display:none;
+}
+
+.link-box{
+background:rgba(255,255,255,0.08);
+padding:15px;
+border-radius:10px;
+margin-top:20px;
+word-break:break-all;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card" id="loginBox">
+
+<h2>GrowX Admin Login</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<div class="error" id="error">
+Invalid Username or Password
+</div>
+
+</div>
+
+<div class="card panel" id="adminPanel">
+
+<h2>Admin Panel</h2>
+
+<p>Google Sheet Link</p>
+
+<div class="link-box" id="sheetLink"></div>
+
+<button onclick="copyLink()">Copy Link</button>
+
+<button onclick="openSheet()">Open in Browser</button>
+
+</div>
+
+<script>
+
+/* browser-only sheet links */
+
+const link1="https://docs.google.com/spreadsheets/d/1sHTuSXlxmBUrwHszeufo4C_8W2fm9at6Ef8ZLkSlr-E/preview";
+
+const link2="https://docs.google.com/spreadsheets/d/1sHTuSXlxmBUrwHszeufo4C_8W2fm9at6Ef8ZLkSlr-E/edit?usp=drivesdk";
+
+let currentLink="";
+
+/* login */
+
+function login(){
+
+let user=document.getElementById("username").value;
+let pass=document.getElementById("password").value;
+
+if(user==="er_broken_x_ravi" && pass==="GXRAVI"){
+
+currentLink=link1;
+openPanel();
+
+}
+
+else if(user==="GXRAVI" && pass==="GXEDITOR"){
+
+currentLink=link2;
+openPanel();
+
+}
+
+else{
+
+document.getElementById("error").style.display="block";
+
+}
+
+}
+
+/* open panel */
+
+function openPanel(){
+
+document.getElementById("loginBox").style.display="none";
+
+document.getElementById("adminPanel").style.display="block";
+
+document.getElementById("sheetLink").innerText=currentLink;
+
+}
+
+/* copy */
+
+function copyLink(){
+
+navigator.clipboard.writeText(currentLink);
+alert("Link Copied");
+
+}
+
+/* open */
+
+function openSheet(){
+
+window.location.href=currentLink;
+
+}
+
+/* particles */
+
+for(let i=0;i<35;i++){
+
+let p=document.createElement("div");
+
+p.className="particle";
+
+p.style.left=Math.random()*100+"vw";
+
+p.style.animationDuration=(5+Math.random()*5)+"s";
+
+document.body.appendChild(p);
+
+}
+
+</script>
+
+</body>
+</html>
